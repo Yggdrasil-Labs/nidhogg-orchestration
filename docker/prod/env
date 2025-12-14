@@ -1,0 +1,11 @@
+# 生产环境配置
+SPRING_PROFILES_ACTIVE=production
+RESTART_POLICY=always
+HTTP_PORT=8081
+SERVICE_PORT=20880
+JAVA_OPTS=-Xms256m -Xmx512m -XX:+UseG1GC -XX:MaxRAM=1024m
+# Dubbo 配置
+DUBBO_REGISTRY_ADDRESS=nacos://nacos-standalone-derby:8848
+DUBBO_NAMESPACE=production
+DUBBO_GROUP=valhalla-auth
+

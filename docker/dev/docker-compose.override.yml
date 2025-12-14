@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  valhalla-auth:
+    # 开发环境可以挂载日志目录以便调试
+    volumes:
+      - ./logs:/app/logs
+    # 开发环境可以暴露更多调试端口
+    ports:
+      - "${HTTP_PORT:-8081}:8081"
+      - "${SERVICE_PORT:-20880}:20880"
+      - "5005:5005"  # Java 远程调试端口
+    networks:
+      - Yggdrasil-net
+
+networks:
+  Yggdrasil-net:
+    name: Yggdrasil-net
+

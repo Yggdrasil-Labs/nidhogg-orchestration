@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  valhalla-auth:
+    # 测试环境配置
+    environment:
+      - SPRING_PROFILES_ACTIVE=test
+      - JAVA_OPTS=${JAVA_OPTS:--Xms128m -Xmx256m -XX:+UseSerialGC -XX:MaxRAM=512m}
+    networks:
+      - Yggdrasil-net
+
+networks:
+  Yggdrasil-net:
+    name: Yggdrasil-net
+

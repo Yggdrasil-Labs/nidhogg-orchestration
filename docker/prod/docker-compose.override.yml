@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  valhalla-auth:
+    # 生产环境配置
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - JAVA_OPTS=${JAVA_OPTS:--Xms256m -Xmx512m -XX:+UseG1GC -XX:MaxRAM=1024m}
+    # 生产环境限制资源
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    networks:
+      - Yggdrasil-net
+
+networks:
+  Yggdrasil-net:
+    name: Yggdrasil-net
+

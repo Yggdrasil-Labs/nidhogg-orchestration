@@ -1,0 +1,36 @@
+version: '3.8'
+
+name: Yggdrasil-Labs
+services:
+  valhalla-auth:
+    image: valhalla-auth:latest
+    container_name: valhalla-auth
+    restart: ${RESTART_POLICY:-unless-stopped}
+    ports:
+      - "${HTTP_PORT:-8081}:8081"  # HTTP 端口
+      - "${SERVICE_PORT:-20880}:20880"  # 其他服务端口
+    environment:
+      - JAVA_OPTS=${JAVA_OPTS:--Xms128m -Xmx256m -XX:+UseSerialGC -XX:MaxRAM=512m}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-production}
+      # 连接到现有的 Nacos 容器（需要先将其加入 Yggdrasil-net 网络）
+      # 如果 Nacos 在同一网络，使用容器名；否则使用主机地址
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=nacos-standalone-derby:8848
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=nacos-standalone-derby:8848
+      # Dubbo 配置
+      - DUBBO_REGISTRY_ADDRESS=${DUBBO_REGISTRY_ADDRESS:-nacos://nacos-standalone-derby:8848}
+      - DUBBO_NAMESPACE=${DUBBO_NAMESPACE:-production}
+      - DUBBO_GROUP=${DUBBO_GROUP:-valhalla-auth}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - Yggdrasil-net
+
+networks:
+  Yggdrasil-net:
+    driver: bridge
+    name: Yggdrasil-net
+
