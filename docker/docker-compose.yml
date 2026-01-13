@@ -48,6 +48,20 @@ services:
       start_period: 60s
     networks:
       - Yggdrasil-net
+  valhalla-user-admin:
+    image: yggdrasil-labs/valhalla-user-admin:latest
+    container_name: valhalla-user-admin
+    restart: ${RESTART_POLICY:-unless-stopped}
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"  # 前端 HTTP 端口
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - Yggdrasil-net
 networks:
   Yggdrasil-net:
     driver: bridge

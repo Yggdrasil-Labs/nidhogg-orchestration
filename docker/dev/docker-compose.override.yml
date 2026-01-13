@@ -23,6 +23,13 @@ services:
     networks:
       - Yggdrasil-net
 
+  valhalla-user-admin:
+    # 开发环境前端端口配置（8080 被 nacos 占用，使用 8083）
+    ports:
+      - "${FRONTEND_PORT:-8083}:80"
+    networks:
+      - Yggdrasil-net
+
 networks:
   Yggdrasil-net:
     name: Yggdrasil-net

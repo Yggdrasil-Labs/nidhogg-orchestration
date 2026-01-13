@@ -35,6 +35,22 @@ services:
     networks:
       - Yggdrasil-net
 
+  valhalla-user-admin:
+    # 生产环境前端端口配置
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    # 生产环境限制资源
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    networks:
+      - Yggdrasil-net
+
 networks:
   Yggdrasil-net:
     name: Yggdrasil-net
