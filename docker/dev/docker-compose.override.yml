@@ -1,4 +1,15 @@
 services:
+  nacos-standalone-derby:
+    ports:
+      - "${NACOS_HTTP_PORT:-8848}:8848"
+      - "${NACOS_GRPC_PORT:-9848}:9848"
+      - "${NACOS_CONSOLE_PORT:-8080}:8080"
+    expose:
+      - "9849"
+      - "7848"
+    networks:
+      - Yggdrasil-net
+
   valhalla-auth:
     # 开发环境可以挂载日志目录以便调试
     volumes:
@@ -33,4 +44,3 @@ services:
 networks:
   Yggdrasil-net:
     name: Yggdrasil-net
-

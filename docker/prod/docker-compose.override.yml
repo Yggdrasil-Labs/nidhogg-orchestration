@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+  nacos-standalone-derby:
+    expose:
+      - "8848"
+      - "9848"
+      - "9849"
+      - "7848"
+    networks:
+      - Yggdrasil-net
+
   valhalla-auth:
     # 生产环境配置
     environment:
