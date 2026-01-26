@@ -23,7 +23,7 @@ services:
     networks:
       - Yggdrasil-net
   valhalla-auth:
-    image: yggdrasil-labs/valhalla-auth:latest
+    image: ghcr.io/yggdrasil-labs/valhalla-auth:latest
     container_name: valhalla-auth
     restart: ${RESTART_POLICY:-unless-stopped}
     ports:
