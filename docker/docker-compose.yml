@@ -69,7 +69,7 @@ services:
     networks:
       - Yggdrasil-net
   valhalla-user-admin:
-    image: yggdrasil-labs/valhalla-user-admin:latest
+    image: ghcr.io/yggdrasil-labs/valhalla-user-admin:latest
     container_name: valhalla-user-admin
     restart: ${RESTART_POLICY:-unless-stopped}
     ports:
