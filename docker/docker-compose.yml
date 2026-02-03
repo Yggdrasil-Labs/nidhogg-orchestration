@@ -1,7 +1,7 @@
 name: Yggdrasil-Labs
 services:
   nacos-standalone-derby:
-    image: nacos/nacos-server:latest
+    image: nacos/nacos-server:v3.0.3
     container_name: nacos-standalone-derby
     restart: ${RESTART_POLICY:-unless-stopped}
     environment:
@@ -35,8 +35,12 @@ services:
       # Nacos 服务地址（同一网络内使用容器名）
       - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=nacos-standalone-derby:8848
       - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=nacos-standalone-derby:8848
-      # Dubbo 配置
-      - DUBBO_REGISTRY_ADDRESS=${DUBBO_REGISTRY_ADDRESS:-nacos://nacos-standalone-derby:8848}
+      # Nacos 认证（服务端开启鉴权时必填，默认 nacos/nacos）
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+      - SPRING_CLOUD_NACOS_CONFIG_NAMESPACE=${DUBBO_NAMESPACE:-production}
+      # Dubbo 配置（地址中需带 Nacos 用户名密码，否则鉴权开启时 Naming Service 不可用）
+      - DUBBO_REGISTRY_ADDRESS=${DUBBO_REGISTRY_ADDRESS:-nacos://nacos-standalone-derby:8848?username=nacos&password=nacos}
       - DUBBO_NAMESPACE=${DUBBO_NAMESPACE:-production}
       - DUBBO_GROUP=${DUBBO_GROUP:-valhalla-auth}
     healthcheck:
@@ -60,6 +64,10 @@ services:
       # Nacos 服务地址（同一网络内使用容器名）
       - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=nacos-standalone-derby:8848
       - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=nacos-standalone-derby:8848
+      # Nacos 认证（服务端开启鉴权时必填，默认 nacos/nacos）
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+      - SPRING_CLOUD_NACOS_CONFIG_NAMESPACE=${DUBBO_NAMESPACE:-production}
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8081/actuator/health"]
       interval: 30s
@@ -74,6 +82,9 @@ services:
     restart: ${RESTART_POLICY:-unless-stopped}
     ports:
       - "${FRONTEND_PORT:-8080}:80"  # 前端 HTTP 端口
+    environment:
+      # 前端运行时覆盖 API 地址（与镜像约定的 VITE_API_BASE_URL 一致，同一镜像多环境无需重构建）
+      - VITE_API_BASE_URL=${ADMIN_API_BASE_URL:-https://api.yggdrasil-labs.com}
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
       interval: 30s

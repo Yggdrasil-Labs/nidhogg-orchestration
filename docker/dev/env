@@ -16,16 +16,22 @@ USER_JAVA_OPTS=-Xms64m -Xmx128m -XX:+UseSerialGC -XX:MaxRAM=256m
 
 # Valhalla User Admin 前端服务配置
 FRONTEND_PORT=8083
+# 运行时覆盖 API 地址（传入容器的 VITE_API_BASE_URL）。开发环境指向本机 User 服务
+ADMIN_API_BASE_URL=http://localhost:8082
 
-# Dubbo 配置
-DUBBO_REGISTRY_ADDRESS=nacos://nacos-standalone-derby:8848
+# Dubbo 配置（registry 地址需带 Nacos 用户名密码，与 NACOS_USERNAME/NACOS_PASSWORD 一致）
+DUBBO_REGISTRY_ADDRESS=nacos://nacos-standalone-derby:8848?username=nacos&password=nacos
 DUBBO_NAMESPACE=dev
 
 # Nacos 端口配置（dev 暴露控制台）
 NACOS_HTTP_PORT=8848
 NACOS_CONSOLE_PORT=8080
 
-# Nacos Auth 配置
+# Nacos 服务端鉴权（identity/token，仅服务端用）
 NACOS_AUTH_TOKEN=OW92Wm8wQ2hhMTNMUlRlUUNWUkdZc1oyVVl3R201cXQ=
 NACOS_AUTH_IDENTITY_KEY=JSjMTp02YXG2Gtf6
 NACOS_AUTH_IDENTITY_VALUE=PIu4Y3TF6DFLJ0om
+
+# Nacos 客户端登录（Spring/Dubbo 连接 Nacos 时用，默认 nacos/nacos，若服务端改过用户请在此配置）
+NACOS_USERNAME=nacos
+NACOS_PASSWORD=nacos

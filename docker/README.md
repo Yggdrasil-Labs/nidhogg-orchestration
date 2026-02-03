@@ -38,6 +38,11 @@ docker/
 - **依赖**: 依赖 Nacos 服务，启动前会等待 Nacos 健康检查通过
 - **Nacos 连接**: 自动配置连接到 `nacos:8848`
 
+### Valhalla User Admin 前端
+- **镜像**: `ghcr.io/yggdrasil-labs/valhalla-user-admin:latest`
+- **API 地址**: 通过环境变量 **`VITE_API_BASE_URL`** 在运行时覆盖（编排中由 `ADMIN_API_BASE_URL` 传入）。同一镜像可在 dev/test/prod 通过各环境 `env` 配置不同 API 地址，无需重构建。
+- **开发环境**: `dev/env` 中 `ADMIN_API_BASE_URL=http://localhost:8082`，指向本机 User 服务。
+
 ## 网络配置
 所有服务使用统一的网络：`Yggdrasil-net`
 
