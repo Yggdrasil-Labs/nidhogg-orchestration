@@ -1,213 +1,51 @@
-# AI Agent Instructions (AGENTS.md)
+# AGENTS.md
 
-This document defines how AI agents (Cursor, Codex, Claude Code, etc.)
-should behave when working in this repository.
+本文件是智能体的唯一入口，保持为"地图而不是手册"。
 
-The goal is:
-- Safe default behavior
-- Explicit permission for large changes
-- Clear workflow for proposals and refactors
-- No limitation on AI capability when authorized
+## 项目概述
 
----
+nidhogg-orchestration 是 Yggdrasil-Labs 生态的基础设施编排项目，为 Valhalla 平台提供统一的 Docker Compose 部署方案。项目不包含应用代码，仅定义服务编排、网络拓扑和多环境配置（dev / test / prod）。编排服务：Nacos v3.0.3（配置中心 + 服务注册）、valhalla-auth（认证）、valhalla-user（用户管理）、valhalla-user-admin（管理后台前端），所有服务通过 Yggdrasil-net bridge 网络通信。
 
-## 1. Core Principle (Most Important)
+## 全局规范
 
-- AI capability is NOT restricted
-- Default behavior must be SAFE and CONSERVATIVE
-- Explicit user instructions ALWAYS override all rules and specs
+1. 智能体优先遵循项目规范（`AGENTS.md`、`ARCHITECTURE.md`、`docs/design-docs/`）。项目约束 > 智能体全局约束。
+2. Git Conventional Commits，message 中文。格式：`<type>(<scope>): <中文描述>`。
+3. 文档与代码冲突时以代码为准并回写文档。
 
-If the user explicitly requests:
-- a complete feature
-- a refactor
-- cross-file or cross-module changes
+## 导航
 
-AI is fully authorized to proceed.
+### A. 长期约束（只读，修改需架构 RFC）
 
----
+- 系统边界与依赖方向：[`ARCHITECTURE.md`](./ARCHITECTURE.md)
 
-## 2. General Behavior Rules
+### B. 流转文档
 
-- Prefer minimal, incremental changes by default
-- Never assume refactoring is allowed unless stated
-- Do not make architectural decisions silently
-- When scope or impact is unclear, STOP and ASK
-- Code clarity > clever abstractions
+- 活跃版本：[`docs/active/index.md`](./docs/active/index.md)
+- 版本归档：[`docs/archive/index.md`](./docs/archive/index.md)
+- 技术债：[`docs/active/tech-debt-tracker.md`](./docs/active/tech-debt-tracker.md)
+- 设计决策：[`docs/design-docs/index.md`](./docs/design-docs/index.md)
 
-AI should behave like a senior engineer who knows when to ask for approval.
+## 开发命令
 
----
+```bash
+# 启动开发环境
+cd docker/dev && ./start.sh
+# 等价手动命令
+docker-compose -f docker/docker-compose.yml -f docker/dev/docker-compose.override.yml --env-file docker/dev/env up -d
 
-## 3. Workflow Rules (Key Section)
+# 启动测试环境
+docker-compose -f docker/docker-compose.yml -f docker/test/docker-compose.override.yml --env-file docker/test/env up -d
 
-### 3.1 Small / Localized Changes
-Examples:
-- Bug fixes
-- Single-file changes
-- Minor logic adjustments
+# 启动生产环境
+docker-compose -f docker/docker-compose.yml -f docker/prod/docker-compose.override.yml --env-file docker/prod/env up -d
 
-Rules:
-- Direct implementation is allowed
-- Inline edits are preferred
-- No plan or proposal is required
+# 停止服务
+docker-compose -f docker/docker-compose.yml -f docker/{env}/docker-compose.override.yml --env-file docker/{env}/env down
 
----
+# 查看日志
+docker-compose -f docker/docker-compose.yml -f docker/{env}/docker-compose.override.yml --env-file docker/{env}/env logs -f [service_name]
 
-### 3.2 Multi-file Changes / New Features
-Examples:
-- New functionality
-- Changes affecting multiple files or modules
-- Behavior changes
-
-Rules:
-- AI MUST propose a plan before implementation
-- The plan should include:
-  - Scope of change
-  - Affected files or modules
-  - Potential risks
-- Implementation starts only after user confirmation
-
----
-
-### 3.3 Refactoring Tasks
-Examples:
-- Code cleanup
-- Structural changes
-- Abstraction improvements
-
-Rules:
-- Refactoring is NOT allowed by default
-- AI MUST propose a refactoring plan
-- AI MUST wait for explicit user approval before changing code
-
----
-
-### 3.4 Unclear or Risky Tasks
-
-If any of the following is true:
-- Requirements are ambiguous
-- Impact cannot be determined confidently
-- There is risk of breaking existing behavior
-
-AI MUST stop and ask for clarification before proceeding.
-
----
-
-## 4. OpenSpec Integration (Authoritative Specs)
-
-When the request:
-- Mentions planning, proposals, specs, or change plans
-- Introduces new capabilities, breaking changes, or architecture shifts
-- Involves large refactors, performance, or security work
-- Is ambiguous and requires authoritative guidance
-
-AI MUST open and follow:
-
-@/openspec/AGENTS.md
-
-That document defines:
-- Proposal workflow
-- Spec format and conventions
-- Rules for large-scale or structural changes
-- Project-specific governance
-
-Explicit user instructions override OpenSpec rules.
-
----
-
-## 4.1 MCP Documentation Lookup (Context7)
-
-When planning changes that involve major architecture, framework-level behavior,
-or tech-stack decisions, the AI MUST query official documentation via the Context7 MCP
-**if available**. If the Context7 MCP is not available, the AI MUST explicitly state that
-and proceed using local project context and existing specifications only.
-
-Examples of when to use Context7:
-- Selecting, introducing, or changing core frameworks or libraries
-- Introducing new infrastructure components (e.g., messaging systems, service discovery)
-- Altering architectural patterns or layering rules
-- Security-sensitive, lifecycle-related, or configuration-dependent framework behavior
-  (e.g., Spring Security, framework annotations, initialization order, version differences)
-
-If a user explicitly opts out, the MCP lookup may be skipped.
-
----
-
-## 5. Allowed Actions
-
-AI MAY:
-- Add new files, classes, or components when authorized
-- Modify existing code within approved scope
-- Implement complete features when explicitly requested
-- Perform large refactors when explicitly authorized
-- Add tests or documentation
-- Improve readability without changing behavior
-
----
-
-## 6. Forbidden Actions (Unless Explicitly Authorized)
-
-AI MUST NOT:
-- Delete files or directories
-- Rename public APIs, endpoints, or exported functions
-- Change database schemas or persistent data structures
-- Upgrade frameworks or dependencies
-- Change project build or tooling structure
-- Introduce new architectural patterns silently
-
-User authorization overrides these rules.
-
----
-
-## 7. Backend-Specific Rules (If Applicable)
-
-- Follow layered architecture (Controller / Service / Repository)
-- Controllers handle request/response only
-- Do not change API contracts without explicit approval
-- Maintain backward compatibility by default
-- Keep changes localized and testable
-
----
-
-## 8. Frontend-Specific Rules (If Applicable)
-
-- Use Vue 3 Composition API
-- Keep components small and focused
-- Do not change UI behavior or UX flows unless requested
-- Do not change API request paths or contracts
-- Prefer explicit state management (e.g. Pinia)
-
----
-
-## 9. Communication Rules
-
-AI MUST:
-- Explain non-trivial changes
-- Clearly state assumptions
-- Highlight risky or irreversible operations
-- Never hide side effects or implicit changes
-
----
-
-## 10. Conflict Resolution Priority
-
-1. Explicit user instructions
-2. This AGENTS.md
-3. @/openspec/AGENTS.md
-4. Existing project conventions
-5. AI default behavior
-
-If conflicts remain, ask before proceeding.
-
----
-
-## 11. Language Policy
-
-All responses, plans, explanations, and code comments MUST be written in Simplified Chinese.
-
-1. Do not switch languages unless the user explicitly requests otherwise.
-2. Do not include English explanations, except for code identifiers, APIs, or proper nouns.
-
----
-
-End of instructions.
+# 重建单个服务（拉取最新镜像）
+docker-compose -f docker/docker-compose.yml -f docker/{env}/docker-compose.override.yml --env-file docker/{env}/env pull [service_name]
+docker-compose -f docker/docker-compose.yml -f docker/{env}/docker-compose.override.yml --env-file docker/{env}/env up -d [service_name]
+```
